@@ -16,7 +16,7 @@ app.use(cookieParser());
 
 app.use(
   cors({
-    origin: 'https://assignmen-5-client.vercel.app',
+    origin: 'portfolio-opal-kappa-73.vercel.app',
     credentials: true,
   }),
 );

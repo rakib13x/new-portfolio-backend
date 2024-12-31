@@ -8,8 +8,51 @@ import { TProject } from '../interface/project.interface';
 const createProject = catchAsync(async (req, res) => {
     console.log('Processing project creation...');
 
+    // Extract fields from req.body
+    const { name, description, link, technologies, time } = req.body;
+
+    // Handle the photo file
+    let photoUrl: string;
+    if (req.file && req.file.path) {
+        photoUrl = req.file.path; // Cloudinary URL
+    } else {
+        return res.status(httpStatus.BAD_REQUEST).json({
+            success: false,
+            message: 'Project photo is required!',
+        });
+    }
+
+    // Parse technologies array
+    const technologiesArray = Array.isArray(technologies)
+        ? technologies
+        : typeof technologies === 'string'
+            ? technologies.split(',').map((tech: string) => tech.trim()).filter((tech: string) => tech.length > 0)
+            : [];
+
+    if (technologiesArray.length === 0) {
+        return res.status(httpStatus.BAD_REQUEST).json({
+            success: false,
+            message: 'At least one technology is required!',
+        });
+    }
+
+    // Ensure 'link' is provided
+    if (!link || typeof link !== 'string' || link.trim() === '') {
+        return res.status(httpStatus.BAD_REQUEST).json({
+            success: false,
+            message: 'Project link is required!',
+        });
+    }
+
     const projectData: TProject = {
-        ...req.body,
+        name,
+        photo: photoUrl,
+        description,
+        link: link.trim(),
+        technologies: technologiesArray,
+        time,
+        createdAt: undefined,
+        updatedAt: undefined
     };
 
     console.log('Project data to create:', projectData);
@@ -24,13 +67,12 @@ const createProject = catchAsync(async (req, res) => {
         });
     } catch (err) {
         console.error('Error creating project:', err);
-        return res.status(500).json({
+        return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: 'Internal server error while creating project.',
         });
     }
 });
-
 const getAllProjects = catchAsync(async (req, res) => {
     const projects = await ProjectServices.getAllProjects();
     sendResponse(res, {

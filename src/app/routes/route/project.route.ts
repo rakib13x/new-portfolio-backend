@@ -5,13 +5,15 @@ import {
     createProjectValidationSchema,
     updateProjectValidationSchema,
 } from '../../validations/project.validation';
+import { multerUpload } from '../../config/multer.config';
 
 const router = express.Router();
 
 // Create a new project
 router.post(
     '/create-project',
-    validateProject(createProjectValidationSchema),
+    multerUpload.single('photo'),
+    // validateProject(createProjectValidationSchema),
     ProjectControllers.createProject
 );
 

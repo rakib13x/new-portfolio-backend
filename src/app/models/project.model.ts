@@ -16,6 +16,10 @@ const projectSchema = new Schema<TProject>(
             type: String,
             required: [true, 'Project description is required'],
         },
+        link: {
+            type: String,
+            required: [true, 'Project link is required'],
+        },
         technologies: {
             type: [String],
             required: [true, 'At least one technology is required'],
